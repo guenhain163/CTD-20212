@@ -1,0 +1,9 @@
+Program Example;
+   
+Var n : Integer;
+
+Begin
+  n := 2 ** 3;
+  Call WriteLn;
+  Call WriteI(n);
+End.
