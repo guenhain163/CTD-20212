@@ -1,0 +1,18 @@
+Program test;
+
+Var n : Integer;
+
+procedure hello;
+var a : Integer;
+Begin
+    switch n
+    begin 
+        case 1 : n := a + 1
+        case 2 : n := a + 2
+        default : n := a * 2
+    end;
+end;
+
+Begin
+  CALL hello;
+End. 
