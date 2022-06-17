@@ -12,7 +12,9 @@
 enum TypeClass {
   TP_INT,
   TP_CHAR,
-  TP_ARRAY
+  TP_ARRAY,
+  TP_DOUBLE,
+  TP_STRING
 };
 
 enum ObjectKind {
@@ -44,6 +46,7 @@ struct ConstantValue_ {
   enum TypeClass type;
   union {
     int intValue;
+    double doubleValue;
     char charValue;
   };
 };
@@ -137,6 +140,8 @@ typedef struct SymTab_ SymTab;
 
 Type* makeIntType(void);
 Type* makeCharType(void);
+Type* makeDoubleType(void);
+Type* makeStringType(int size, Type* elementType);
 Type* makeArrayType(int arraySize, Type* elementType);
 Type* duplicateType(Type* type);
 int compareType(Type* type1, Type* type2);
@@ -144,6 +149,7 @@ void freeType(Type* type);
 
 ConstantValue* makeIntConstant(int i);
 ConstantValue* makeCharConstant(char ch);
+ConstantValue* makeDoubleConstant(double d);
 ConstantValue* duplicateConstantValue(ConstantValue* v);
 
 Scope* createScope(Object* owner, Scope* outer);

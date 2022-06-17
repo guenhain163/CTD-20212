@@ -18,6 +18,7 @@ Token *lookAhead;
 
 extern Type* intType;
 extern Type* charType;
+extern Type* doubleType;
 extern SymTab* symtab;
 
 void scan(void) {
@@ -207,6 +208,10 @@ ConstantValue* compileUnsignedConstant(void) {
     eat(TK_NUMBER);
     constValue = makeIntConstant(currentToken->value);
     break;
+  case TK_DOUBLE:
+    eat(TK_DOUBLE);
+    constValue = makeDoubleConstant(currentToken->value);
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
 
@@ -237,6 +242,7 @@ ConstantValue* compileConstant(void) {
     eat(SB_MINUS);
     constValue = compileConstant2();
     constValue->intValue = - constValue->intValue;
+    constValue->doubleValue = - constValue->doubleValue;
     break;
   case TK_CHAR:
     eat(TK_CHAR);
@@ -258,10 +264,16 @@ ConstantValue* compileConstant2(void) {
     eat(TK_NUMBER);
     constValue = makeIntConstant(currentToken->value);
     break;
+  case TK_DOUBLE:
+    eat(TK_DOUBLE);
+    constValue = makeDoubleConstant(currentToken->value);
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
     obj = checkDeclaredConstant(currentToken->string);
     if (obj->constAttrs->value->type == TP_INT)
+      constValue = duplicateConstantValue(obj->constAttrs->value);
+    else if (obj->constAttrs->value->type == TP_DOUBLE)
       constValue = duplicateConstantValue(obj->constAttrs->value);
     else
       error(ERR_UNDECLARED_INT_CONSTANT,currentToken->lineNo, currentToken->colNo);
@@ -292,6 +304,7 @@ Type* compileType(void) {
     eat(KW_ARRAY);
     eat(SB_LSEL);
     eat(TK_NUMBER);
+    eat(TK_DOUBLE);
 
     arraySize = currentToken->value;
 
@@ -299,6 +312,10 @@ Type* compileType(void) {
     eat(KW_OF);
     elementType = compileType();
     type = makeArrayType(arraySize, elementType);
+    break;
+  case KW_DOUBLE: 
+    eat(KW_DOUBLE);
+    type =  makeDoubleType();
     break;
   case TK_IDENT:
     eat(TK_IDENT);
@@ -323,6 +340,10 @@ Type* compileBasicType(void) {
   case KW_CHAR: 
     eat(KW_CHAR); 
     type = makeCharType();
+    break;
+  case KW_DOUBLE: 
+    eat(KW_DOUBLE); 
+    type = makeDoubleType();
     break;
   default:
     error(ERR_INVALID_BASICTYPE, lookAhead->lineNo, lookAhead->colNo);
@@ -738,6 +759,10 @@ Type* compileFactor(void) {
     eat(TK_CHAR);
     type = charType;
     break;
+  case TK_DOUBLE:
+    eat(TK_DOUBLE);
+    type = doubleType;
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
     obj = checkDeclaredIdent(currentToken->string);
@@ -745,14 +770,17 @@ Type* compileFactor(void) {
     switch (obj->kind) {
     case OBJ_CONSTANT:
       switch (obj->constAttrs->value->type) {
-      case TP_INT:
-	type = intType;
-	break;
-      case TP_CHAR:
-	type = charType;
-	break;
-      default:
-	break;
+        case TP_INT:
+          type = intType;
+          break;
+        case TP_DOUBLE:
+          type = doubleType;
+          break;
+        case TP_CHAR:
+          type = charType;
+          break;
+        default:
+          break;
       }
       break;
     case OBJ_VARIABLE:

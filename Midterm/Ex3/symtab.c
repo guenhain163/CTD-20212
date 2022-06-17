@@ -18,6 +18,7 @@ void freeReferenceList(ObjectNode *objList);
 SymTab* symtab;
 Type* intType;
 Type* charType;
+Type* doubleType;
 
 /******************* Type utilities ******************************/
 
@@ -30,6 +31,12 @@ Type* makeIntType(void) {
 Type* makeCharType(void) {
   Type* type = (Type*) malloc(sizeof(Type));
   type->typeClass = TP_CHAR;
+  return type;
+}
+
+Type* makeDoubleType(void) {
+  Type* type = (Type*) malloc(sizeof(Type));
+  type->typeClass = TP_DOUBLE;
   return type;
 }
 
@@ -64,10 +71,15 @@ int compareType(Type* type1, Type* type2) {
 void freeType(Type* type) {
   switch (type->typeClass) {
   case TP_INT:
+  case TP_DOUBLE:
   case TP_CHAR:
     free(type);
     break;
   case TP_ARRAY:
+    freeType(type->elementType);
+    freeType(type);
+    break;
+  case TP_STRING:
     freeType(type->elementType);
     freeType(type);
     break;
@@ -83,6 +95,13 @@ ConstantValue* makeIntConstant(int i) {
   return value;
 }
 
+ConstantValue* makeDoubleConstant(double d) {
+  ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
+  value->type = TP_DOUBLE;
+  value->doubleValue = d;
+  return value;
+}
+
 ConstantValue* makeCharConstant(char ch) {
   ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
   value->type = TP_CHAR;
@@ -95,6 +114,8 @@ ConstantValue* duplicateConstantValue(ConstantValue* v) {
   value->type = v->type;
   if (v->type == TP_INT) 
     value->intValue = v->intValue;
+  else if (v->type == TP_DOUBLE) 
+    value->doubleValue = v->doubleValue;
   else
     value->charValue = v->charValue;
   return value;
@@ -278,6 +299,10 @@ void initSymTab(void) {
   obj->funcAttrs->returnType = makeIntType();
   addObject(&(symtab->globalObjectList), obj);
 
+  // obj = createFunctionObject("READD");
+  // obj->funcAttrs->returnType = makeDoubleType();
+  // addObject(&(symtab->globalObjectList), obj);
+
   obj = createProcedureObject("WRITEI");
   param = createParameterObject("i", PARAM_VALUE, obj);
   param->paramAttrs->type = makeIntType();
@@ -293,8 +318,15 @@ void initSymTab(void) {
   obj = createProcedureObject("WRITELN");
   addObject(&(symtab->globalObjectList), obj);
 
+  obj = createProcedureObject("WRITED");
+  param = createParameterObject("d", PARAM_VALUE, obj);
+  param->paramAttrs->type = makeDoubleType();
+  addObject(&(obj->procAttrs->paramList),param);
+  addObject(&(symtab->globalObjectList), obj);
+
   intType = makeIntType();
   charType = makeCharType();
+  doubleType = makeDoubleType();
 }
 
 void cleanSymTab(void) {
