@@ -19,6 +19,7 @@ Token *lookAhead;
 extern Type* intType;
 extern Type* charType;
 extern Type* doubleType;
+extern Type* stringType;
 extern SymTab* symtab;
 
 void scan(void) {
@@ -223,6 +224,10 @@ ConstantValue* compileUnsignedConstant(void) {
     eat(TK_CHAR);
     constValue = makeCharConstant(currentToken->string[0]);
     break;
+  case TK_STRING:
+    eat(TK_STRING);
+    constValue = makeStringConstant(currentToken->stringValue);
+    break;
   default:
     error(ERR_INVALID_CONSTANT, lookAhead->lineNo, lookAhead->colNo);
     break;
@@ -247,6 +252,10 @@ ConstantValue* compileConstant(void) {
   case TK_CHAR:
     eat(TK_CHAR);
     constValue = makeCharConstant(currentToken->string[0]);
+    break;
+  case TK_STRING:
+    eat(TK_STRING);
+    constValue = makeStringConstant(currentToken->stringValue);
     break;
   default:
     constValue = compileConstant2();
@@ -317,6 +326,10 @@ Type* compileType(void) {
     eat(KW_DOUBLE);
     type =  makeDoubleType();
     break;
+  case KW_STRING: 
+    eat(KW_STRING); 
+    type = makeStringType();
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
     obj = checkDeclaredType(currentToken->string);
@@ -344,6 +357,10 @@ Type* compileBasicType(void) {
   case KW_DOUBLE: 
     eat(KW_DOUBLE); 
     type = makeDoubleType();
+    break;
+  case KW_STRING: 
+    eat(KW_STRING); 
+    type = makeStringType();
     break;
   default:
     error(ERR_INVALID_BASICTYPE, lookAhead->lineNo, lookAhead->colNo);
@@ -763,6 +780,10 @@ Type* compileFactor(void) {
     eat(TK_DOUBLE);
     type = doubleType;
     break;
+  case TK_STRING:
+    eat(TK_STRING);
+    type = stringType;
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
     obj = checkDeclaredIdent(currentToken->string);
@@ -778,6 +799,9 @@ Type* compileFactor(void) {
           break;
         case TP_CHAR:
           type = charType;
+          break;
+        case TP_STRING:
+          type = stringType;
           break;
         default:
           break;

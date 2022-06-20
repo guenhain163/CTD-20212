@@ -19,6 +19,7 @@ SymTab* symtab;
 Type* intType;
 Type* charType;
 Type* doubleType;
+Type* stringType;
 
 /******************* Type utilities ******************************/
 
@@ -45,6 +46,12 @@ Type* makeArrayType(int arraySize, Type* elementType) {
   type->typeClass = TP_ARRAY;
   type->arraySize = arraySize;
   type->elementType = elementType;
+  return type;
+}
+
+Type* makeStringType(void) {
+  Type* type = (Type*) malloc(sizeof(Type));
+  type->typeClass = TP_STRING;
   return type;
 }
 
@@ -80,8 +87,7 @@ void freeType(Type* type) {
     freeType(type);
     break;
   case TP_STRING:
-    freeType(type->elementType);
-    freeType(type);
+    free(type);
     break;
   }
 }
@@ -106,6 +112,13 @@ ConstantValue* makeCharConstant(char ch) {
   ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
   value->type = TP_CHAR;
   value->charValue = ch;
+  return value;
+}
+
+ConstantValue* makeStringConstant(char* str) {
+  ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
+  value->type = TP_CHAR;
+  strcpy(value->stringValue, str);
   return value;
 }
 
@@ -327,6 +340,7 @@ void initSymTab(void) {
   intType = makeIntType();
   charType = makeCharType();
   doubleType = makeDoubleType();
+  stringType = makeStringType();
 }
 
 void cleanSymTab(void) {
@@ -335,6 +349,7 @@ void cleanSymTab(void) {
   free(symtab);
   freeType(intType);
   freeType(charType);
+  freeType(stringType);
 }
 
 void enterBlock(Scope* scope) {

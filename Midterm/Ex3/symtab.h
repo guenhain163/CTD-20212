@@ -48,6 +48,7 @@ struct ConstantValue_ {
     int intValue;
     double doubleValue;
     char charValue;
+    char stringValue[255];
   };
 };
 
@@ -141,7 +142,7 @@ typedef struct SymTab_ SymTab;
 Type* makeIntType(void);
 Type* makeCharType(void);
 Type* makeDoubleType(void);
-Type* makeStringType(int size, Type* elementType);
+Type* makeStringType(void);
 Type* makeArrayType(int arraySize, Type* elementType);
 Type* duplicateType(Type* type);
 int compareType(Type* type1, Type* type2);
@@ -150,6 +151,7 @@ void freeType(Type* type);
 ConstantValue* makeIntConstant(int i);
 ConstantValue* makeCharConstant(char ch);
 ConstantValue* makeDoubleConstant(double d);
+ConstantValue* makeStringConstant(char* str);
 ConstantValue* duplicateConstantValue(ConstantValue* v);
 
 Scope* createScope(Object* owner, Scope* outer);
