@@ -32,6 +32,7 @@ typedef struct {
   TokenType tokenType;
   // int value;
   double value;
+  char stringValue[255];
 } Token;
 
 TokenType checkKeyword(char *string);

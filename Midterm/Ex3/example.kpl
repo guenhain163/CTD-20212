@@ -1,7 +1,7 @@
 program exam;
 var n : double;
-
+    s : string;
+    
 begin
-    n := .5;
-    call WRITED(n);
+    s := "String";
 end.

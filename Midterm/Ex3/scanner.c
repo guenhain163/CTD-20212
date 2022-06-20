@@ -157,6 +157,35 @@ Token* readConstChar(void) {
   }
 }
 
+Token* readConstString(void) {
+  Token *token = makeToken(TK_STRING, lineNo, colNo);
+  int count = 0;
+
+  readChar();
+  if (currentChar == EOF) {
+    token->tokenType = TK_NONE;
+    error(ERR_INVALID_CONSTANT_STRING, token->lineNo, token->colNo);
+    return token;
+  }
+
+  while (currentChar != EOF && (charCodes[currentChar] != CHAR_QUOTATION_MARKS))
+  {
+    token->stringValue[count++] = currentChar;
+    readChar();
+  }
+  
+  token->stringValue[count] = '\0';
+
+  readChar();
+  if (currentChar == EOF) {
+    token->tokenType = TK_NONE;
+    error(ERR_INVALID_CONSTANT_CHAR, token->lineNo, token->colNo);
+    return token;
+  }
+
+  return token;
+}
+
 Token* getToken(void) {
   Token *token;
   int ln, cn;
@@ -168,6 +197,8 @@ Token* getToken(void) {
   case CHAR_SPACE: skipBlank(); return getToken();
   case CHAR_LETTER: return readIdentKeyword();
   case CHAR_DIGIT: return readNumber();
+  case CHAR_QUOTATION_MARKS:
+    return readConstString();
   case CHAR_PLUS: 
     token = makeToken(SB_PLUS, lineNo, colNo);
     readChar();
