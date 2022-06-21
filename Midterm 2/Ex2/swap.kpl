@@ -1,0 +1,11 @@
+Program Swap;
+   
+Var n : Integer;
+    m : Integer;
+    tmp : Integer;
+
+Begin
+  m := 1;
+  n := 2;
+  tmp, m, n := m, n, tmp;
+End.
